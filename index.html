@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thumbnail Feed Test</title>
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--grey:#6e6e73;--line:#d2d2d7;--accent:#0a7d5a;--accent-soft:#e6f4ee}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--grey:#a1a1a6;--line:#38383a;--accent:#30c48d;--accent-soft:#0f2a20}}
+:root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--ink:#f5f5f7;--grey:#a1a1a6;--line:#38383a;--accent:#30c48d;--accent-soft:#0f2a20}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1840px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:24px;margin:0 0 2px;letter-spacing:-.3px}
+.sub{color:var(--grey);margin:0 0 16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;grid-template-columns:minmax(260px,1.2fr) minmax(220px,1fr) minmax(220px,1fr);gap:16px}
+@media(max-width:900px){.panel{grid-template-columns:1fr}}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:.15s}
+.drop.over,.drop:hover{border-color:var(--accent);background:var(--accent-soft)}
+.drop b{display:block;font-size:15px;margin-bottom:2px}
+.drop small{color:var(--grey)}
+label{display:block;font-size:12px;color:var(--grey);margin:0 0 4px}
+input[type=text]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+button:disabled{opacity:.4;cursor:default}
+.steps{margin:0;padding-left:18px;color:var(--grey)}
+.steps b{color:var(--ink)}
+.thumbs{display:flex;gap:8px;margin-top:10px}
+.thumbs div{width:96px}
+.thumbs img{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;display:block}
+.thumbs span{font-size:11px;color:var(--grey)}
+.stage{display:flex;gap:28px;flex-wrap:wrap;margin-top:24px;align-items:flex-start}
+.shot{flex:none}
+.shot h2{font-size:13px;font-weight:600;margin:0 0 8px;color:var(--grey)}
+.shot h2 em{font-style:normal;color:var(--ink)}
+/* phones: fixed YouTube-like colours, never themed */
+.phone{width:406px;height:796px;overflow:hidden;border-radius:28px;border:8px solid #2c2c2e;position:relative;font-family:Roboto,"Helvetica Neue",Arial,sans-serif}
+.phone.dark{background:#0f0f0f;color:#f1f1f1}
+.phone.light{background:#fff;color:#0f0f0f}
+.bar{height:48px;display:flex;align-items:center;padding:0 12px;gap:8px}
+.chips{display:flex;gap:8px;padding:4px 12px 10px;overflow:hidden;white-space:nowrap}
+.chip{padding:5px 12px;border-radius:8px;font-size:13px;font-weight:500}
+.dark .chip{background:#272727}.light .chip{background:#f2f2f2}
+.dark .chip.sel{background:#f1f1f1;color:#0f0f0f}.light .chip.sel{background:#0f0f0f;color:#fff}
+.logo{width:28px;height:20px;border-radius:6px;background:#ff0033;position:relative}
+.logo:after{content:"";position:absolute;left:11px;top:5px;border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.bar .sp{flex:1}
+.ico{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;opacity:.8}
+.tb{position:relative;background:#333;overflow:hidden}
+.tb img{width:100%;height:100%;object-fit:cover;display:block}
+.tb .len{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.8);color:#fff;font-size:12px;font-weight:500;padding:1px 4px;border-radius:4px}
+.tb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:13px;background:repeating-linear-gradient(45deg,#3a3a3a 0 12px,#333 12px 24px)}
+.card .tb{width:390px;height:219px}
+.meta{display:flex;gap:12px;padding:12px 12px 22px}
+.av{width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff}
+.t{font-size:15px;font-weight:500;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.m{font-size:12px;margin-top:3px}
+.dark .m{color:#aaa}.light .m{color:#606060}
+.player{width:390px;height:219px}
+.wtitle{padding:10px 12px 4px;font-size:17px;font-weight:600;line-height:1.3}
+.wmeta{padding:0 12px 12px;font-size:12px;color:#aaa}
+.rowv{display:flex;gap:10px;padding:6px 12px}
+.rowv .tb{width:168px;height:94px;flex:none;border-radius:8px}
+.rowv .tb .len{font-size:11px;right:4px;bottom:4px}
+.rowv .t{font-size:14px}
+.desk{width:880px;background:#0f0f0f;color:#f1f1f1;border-radius:14px;border:8px solid #2c2c2e;padding:18px 20px 24px;font-family:Roboto,"Helvetica Neue",Arial,sans-serif}
+.desk .chead{display:flex;gap:14px;align-items:center;margin-bottom:16px}
+.desk .chead .av{width:56px;height:56px;font-size:22px}
+.desk .tabs{display:flex;gap:22px;font-size:14px;color:#aaa;border-bottom:1px solid #333;padding-bottom:8px;margin-bottom:14px}
+.desk .tabs b{color:#f1f1f1;border-bottom:2px solid #f1f1f1;padding-bottom:7px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px 12px}
+.grid .tb{width:100%;aspect-ratio:16/9;border-radius:10px}
+.grid .t{font-size:14px;margin-top:8px}
+.grid .m{color:#aaa}
+.ours .tb{outline:0}
+.note{color:var(--grey);font-size:12px;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Thumbnail Feed Test</h1>
+  <p class="sub">See your thumbnail where viewers see it: on a phone, between the videos our viewers actually watch. <span id="built"></span></p>
+
+  <div class="panel">
+    <div>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Add thumbnails">
+        <b>Drop your thumbnail here</b>
+        <small>or click to choose. Up to 3 at once (A, B, C). JPG or PNG, 16:9.</small>
+        <input type="file" id="file" accept="image/*" multiple hidden>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div>
+      <label for="title">Title it pairs with</label>
+      <input type="text" id="title" value="Your title goes here">
+      <div class="row">
+        <div style="flex:1"><label for="len">Video length</label><input type="text" id="len" value="15:00"></div>
+      </div>
+      <div class="row" id="opts"><span style="color:var(--grey);font-size:12px">Showing:</span></div>
+      <div class="row"><button id="shuffle">Shuffle the other videos</button></div>
+    </div>
+    <div>
+      <ol class="steps">
+        <li>Add your thumbnail and its title.</li>
+        <li>Browser zoom at 100% (Cmd+0 or Ctrl+0).</li>
+        <li><b>Screenshot each of the 4 frames</b> below and name them <b>_feed-dark</b>, <b>_feed-light</b>, <b>_upnext</b>, <b>_channel</b>.</li>
+        <li>Ask: is mine the first thing my eye goes to? Can I tell what it is about in one second? Do the words read in the up next size?</li>
+        <li>Press Shuffle a few times. It has to win against any neighbours, not just one lucky set.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="shot"><h2><em>1 · Home feed, dark</em> · _feed-dark</h2><div class="phone dark" id="homeDark"></div></div>
+    <div class="shot"><h2><em>2 · Home feed, light</em> · _feed-light</h2><div class="phone light" id="homeLight"></div></div>
+    <div class="shot"><h2><em>3 · Up next, dark</em> · _upnext</h2><div class="phone dark" id="upNext"></div></div>
+    <div class="shot"><h2><em>4 · Our channel page</em> · _channel</h2><div class="desk" id="channel"></div></div>
+  </div>
+  <p class="note" id="sources"></p>
+</div>
+
+<script>
+const DATA = {"built": "2026-11-05", "neighbours": [{"id": "Vf43cD-GCyA", "views": 46000, "dur": 695, "title": "YOU ARE A WAHABI: HEATED #Mawlid #Debate", "channel": "One Message Foundation", "group": "audience"}, {"id": "Yo_ZfKVL5YE", "views": 26000, "dur": 413, "title": "😱 What Did This Orthodox Jew Say About SHARIAH?! #shocking", "channel": "One Message Foundation", "group": "audience"}, {"id": "N1K3TY9lRY0", "views": 12000, "dur": 345, "title": "Nigeria Peace Summit 🇳🇬🔥The Middle Path: Islam Against Extremism and Division | Sh Uthman ibn Farooq", "channel": "One Message Foundation", "group": "audience"}, {"id": "Ql1R93EX40E", "views": 97000, "dur": 3849, "title": "Why Should Muslims Trust Hadith? Quran Alone vs Hadith Tradition | Muhammed Ali", "channel": "The Muslim Lantern", "group": "audience"}, {"id": "OziZt_s9s_g", "views": 314000, "dur": 1488, "title": "Confident Atheist Attempts To Outsmart A Muslim Then This Happens! Muhammed Ali", "channel": "The Muslim Lantern", "group": "audience"}, {"id": "kU9x0waUEYY", "views": 208000, "dur": 1551, "title": "Wise Agnostic Challenges A Muslim On Religion And Life After Death! Muhammed Ali", "channel": "The Muslim Lantern", "group": "audience"}, {"id": "ujaXEBLSaWQ", "views": 255000, "dur": 1493, "title": "Agnostic In Total Shock After Asking A Muslim For Proof Of Islam! Muhammed Ali", "channel": "The Muslim Lantern", "group": "audience"}, {"id": "r1CnxywfZow", "views": 25000, "dur": 4060, "title": "How to Walk Away From Salah With a Cleaner Heart | Abu Bakr Zoud", "channel": "Abu Bakr Zoud", "group": "audience"}, {"id": "50bxSLzs0DY", "views": 44000, "dur": 3795, "title": "Elevate Your Salah, 4 Keys to Transforming Your Prayer | Abu Bakr Zoud", "channel": "Abu Bakr Zoud", "group": "audience"}, {"id": "sJ8ObSGzNtQ", "views": 37000, "dur": 3662, "title": "The Repentance Allah Never Rejects, Step By Step | Abu Bakr Zoud | Gold Coast Masjid", "channel": "Abu Bakr Zoud", "group": "audience"}, {"id": "kZB7t8U5s28", "views": 34000, "dur": 4731, "title": "A Call From Paradise: The Story Of The Believer From Surah Yaseen | Abu Bakr Zoud", "channel": "Abu Bakr Zoud", "group": "audience"}, {"id": "naqhIiwC_Vw", "views": 33000, "dur": 3676, "title": "Why Allah Tests Us and the Roadmap to Passing | Abu Bakr Zoud", "channel": "Abu Bakr Zoud", "group": "audience"}, {"id": "npvSghiSIO8", "views": 41000, "dur": 4607, "title": "Living Tawheed & Guarding it Until Death | Abu Bakr Zoud | Newport Masjid", "channel": "Abu Bakr Zoud", "group": "audience"}, {"id": "xF3NkqGMC2M", "views": 452, "dur": 2048, "title": "P2-Atheist's World View Is Completely Destroyed | Muhammed Ali | Speakers Corner", "channel": "DawahWise Gold", "group": "audience"}, {"id": "2BvcWr_BA2s", "views": 912, "dur": 2027, "title": "P1-Atheist's World View Is Completely Destroyed | Muhammed Ali | Speakers Corner", "channel": "DawahWise Gold", "group": "audience"}, {"id": "1UDAWezpbYc", "views": 1100, "dur": 2375, "title": "Satanist worships God and Satan? | Hashim | Speakers Corner", "channel": "DawahWise Gold", "group": "audience"}, {"id": "OdUVs9s7Sz4", "views": 1500, "dur": 1018, "title": "Ignoramus Christian Ends Up Running From Muslim | Mansur | Speakers Corner", "channel": "DawahWise Gold", "group": "audience"}, {"id": "ItM2Rll23cQ", "views": 15000, "dur": 675, "title": "Trump Just Got EMBARRASSED by a Muslim Doctor", "channel": "Smile 2 Jannah", "group": "audience"}, {"id": "-IeUTi8RhYM", "views": 284000, "dur": 1495, "title": "The Real Reason The Government Wants You Ready For 3 Days", "channel": "Smile 2 Jannah", "group": "audience"}, {"id": "4pIFTRq4RKo", "views": 76000, "dur": 1040, "title": "Why Racists Are Defending These Slurs Now", "channel": "Smile 2 Jannah", "group": "audience"}, {"id": "YBsfSfZ0i4E", "views": 208000, "dur": 614, "title": "They FAKED Muslims Praying on the Train and MILLIONS Fell For It", "channel": "Smile 2 Jannah", "group": "audience"}, {"id": "fANkANLEUh8", "views": null, "dur": 4108, "title": "Ayoub & Thom: Halal Business Roadmap to $10,000/mo [LIVE Masterclass]", "channel": "Thom J. Défilet – Halal Business", "group": "watched"}, {"id": "G7FosykbZ5w", "views": null, "dur": 4134, "title": "How Muslim Beginners Can Make $2,500/week (LIVE)", "channel": "Thom J. Défilet – Halal Business", "group": "watched"}, {"id": "lwYee_lK9ag", "views": null, "dur": 4323, "title": "Give Me 72 minutes, I'll Show You How To Build A $10,000/mo Halal Side Hustle (LIVE)", "channel": "Thom J. Défilet – Halal Business", "group": "watched"}, {"id": "MFh7-rzUi_o", "views": null, "dur": 4567, "title": "Thom Défilet Halal Business Lecture [LIVE RECORDING]", "channel": "Thom J. Défilet – Halal Business", "group": "watched"}, {"id": "dBHvOoERCoA", "views": 91, "dur": 399, "title": "Who Hears You in the Dark? | The Story of Prophet Yunus (AS) for Kids", "channel": "Eman Channel", "group": "watched"}, {"id": "PCm_sCwjHYg", "views": 980, "dur": 46, "title": "Türkiye Is Calling You 🇹🇷 | Light Upon Light Global Retreat 2027", "channel": "Eman Channel", "group": "watched"}, {"id": "ko-DtWLOplM", "views": null, "dur": 1643, "title": "Islam in the Spotlight: Why Now? | Shaykh Ali Hammuda", "channel": "Eman Channel", "group": "watched"}, {"id": "MP6KBx8t1Jg", "views": 13000, "dur": 1589, "title": "NEW: Don't Look Back | Shaykh Ali Hammuda", "channel": "Eman Channel", "group": "watched"}, {"id": "Xogp5gAGda0", "views": 1200, "dur": 1018, "title": "NEW: Greatest Deeds In The Sigh of Allah | Shaykh Saeed Al Qadhi", "channel": "Eman Channel", "group": "watched"}, {"id": "UNPQk12r_l8", "views": 3600, "dur": 730, "title": "NEW: The Reality of The Soul | Shaykh Jamal Abdinasir", "channel": "Eman Channel", "group": "watched"}, {"id": "0FBVANdyfYo", "views": 27000, "dur": 1624, "title": "How I Am Buying UK Houses 40 Pence on the Pound", "channel": "Samuel Leeds", "group": "model"}, {"id": "Wvewil9euFQ", "views": 20000, "dur": 2077, "title": "I Bought This Abandoned Business For £1 (Next To Competitors)", "channel": "Samuel Leeds", "group": "model"}, {"id": "TZPJZFsz568", "views": 4900, "dur": 581, "title": "Their School Was Falling Apart... So I Saved It", "channel": "Samuel Leeds", "group": "model"}, {"id": "UWlbRREv0G0", "views": 14000, "dur": 471, "title": "DON’T Buy Land If You See ANY Of These Features", "channel": "Samuel Leeds", "group": "model"}, {"id": "wzclHj8-tQE", "views": 83000, "dur": 1881, "title": "NEVER Keep Over This Amount Of Money In Your UK Bank", "channel": "Samuel Leeds", "group": "model"}, {"id": "jMMhOPCXAEc", "views": 66000, "dur": 1658, "title": "Andy Burnham Will Literally PAY YOU TO Make This Investment", "channel": "Samuel Leeds", "group": "model"}], "ours": [{"id": "WSHb9Ju1c44", "views": 3300, "dur": 1850, "title": "How The Prophet ﷺ Spent His Money", "channel": "Abu Lahya", "group": "ours"}, {"id": "eSGR3I0lzeQ", "views": 10000, "dur": 3347, "title": "The Night Routine of The Prophet ﷺ (Full Breakdown)", "channel": "Abu Lahya", "group": "ours"}, {"id": "9PJICdymZY0", "views": 32000, "dur": 703, "title": "Every Muslim Wants to Make Money Online Until They Hear This", "channel": "Abu Lahya", "group": "ours"}, {"id": "TiEjshtVm1o", "views": null, "dur": 2661, "title": "The Morning Routine of The Prophet ﷺ (Full Breakdown)", "channel": "Abu Lahya", "group": "ours"}, {"id": "XMqlbh9CBuk", "views": 20000, "dur": 717, "title": "The 10 Most Unexpected Purchases That Changed My Life", "channel": "Abu Lahya", "group": "ours"}, {"id": "weU1zl_ZPFA", "views": 62000, "dur": 3699, "title": "How to Command Respect Like a 1% Muslim Man", "channel": "Abu Lahya", "group": "ours"}, {"id": "bF7naO6FmI0", "views": null, "dur": 2690, "title": "Master Discipline as a Muslim With These Strategies (From The Sunnah)", "channel": "Abu Lahya", "group": "ours"}, {"id": "gLr8-cMzWUA", "views": 16000, "dur": 735, "title": "How to Pray Istikhara (FULL BREAKDOWN)", "channel": "Abu Lahya", "group": "ours"}, {"id": "qlPwf1it6mY", "views": 18000, "dur": 739, "title": "9 Mindset Shifts That Made Me Millions", "channel": "Abu Lahya", "group": "ours"}, {"id": "YJR8EMWSVB0", "views": 453000, "dur": 1062, "title": "Asking Muslim Millionaires How They Got Rich!", "channel": "Abu Lahya", "group": "ours"}], "channels": [{"group": "audience", "name": "One Message Foundation"}, {"group": "audience", "name": "The Muslim Lantern"}, {"group": "audience", "name": "Abu Bakr Zoud"}, {"group": "audience", "name": "DawahWise Gold"}, {"group": "audience", "name": "Smile 2 Jannah"}, {"group": "watched", "name": "Thom J. Défilet – Halal Business"}, {"group": "watched", "name": "Eman Channel"}, {"group": "model", "name": "Samuel Leeds"}]};
+const state = {imgs: [], sel: 0, seed: 1};
+const $ = id => document.getElementById(id);
+
+function rng(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647)/2147483647}
+function hash(str){let h=0;for(const c of str)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)}
+function fmtViews(v){if(v==null)return null;if(v>=1e6)return (v/1e6).toFixed(v>=1e7?0:1).replace(/\.0$/,"")+"M views";if(v>=1e3)return Math.round(v/1e3)+"K views";return v+" views"}
+function fmtLen(s){if(!s)return "";const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,"0");return h?`${h}:${String(m).padStart(2,"0")}:${x}`:`${m}:${x}`}
+function age(id){const a=["2 days ago","3 days ago","5 days ago","1 week ago","2 weeks ago","3 weeks ago","1 month ago","2 months ago"];return a[hash(id)%a.length]}
+const COLORS=["#3f51b5","#00897b","#8e24aa","#e65100","#5d4037","#1e88e5","#c62828","#558b2f","#6d4c41","#00838f"];
+function avatar(name,size){const d=document.createElement("div");d.className="av";d.textContent=name.trim()[0];d.style.background=COLORS[hash(name)%COLORS.length];if(size){d.style.width=d.style.height=size+"px"}return d}
+
+function thumb(v, cls){
+  const t=document.createElement("div");t.className="tb"+(cls?" "+cls:"");
+  if(v.ours){
+    const src=state.imgs[state.sel];
+    if(src){const i=new Image();i.src=src.url;i.alt="";t.appendChild(i)}
+    else{const p=document.createElement("div");p.className="ph";p.textContent="Your thumbnail";t.appendChild(p)}
+  }else{
+    const i=new Image();i.alt="";i.loading="lazy";i.src=`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
+    i.onerror=()=>{i.onerror=null;i.src=`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`};t.appendChild(i)
+  }
+  const len=v.ours?$("len").value.trim():fmtLen(v.dur);
+  if(len){const l=document.createElement("span");l.className="len";l.textContent=len;t.appendChild(l)}
+  return t
+}
+function textBlock(v){
+  const w=document.createElement("div");
+  const t=document.createElement("div");t.className="t";t.textContent=v.ours?($("title").value||"Your title"):v.title;
+  const m=document.createElement("div");m.className="m";
+  const views=v.ours?"12K views":fmtViews(v.views);
+  m.textContent=[v.channel,views,v.ours?"1 day ago":age(v.id)].filter(Boolean).join(" · ");
+  w.append(t,m);return w
+}
+function ourVideo(){return {ours:true,channel:"Abu Lahya",id:"ours"}}
+function pick(n){
+  const r=rng(state.seed*7919+13);const pool=DATA.neighbours.slice();
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+  // one per channel first, so a single channel never fills the feed
+  const seen=new Set(),out=[];
+  for(const v of pool){if(!seen.has(v.channel)){seen.add(v.channel);out.push(v)}if(out.length>=n)return out}
+  for(const v of pool){if(!out.includes(v))out.push(v);if(out.length>=n)break}
+  return out
+}
+function topBar(){
+  const f=document.createDocumentFragment();
+  const b=document.createElement("div");b.className="bar";
+  const lg=document.createElement("div");lg.className="logo";const sp=document.createElement("div");sp.className="sp";
+  b.append(lg,sp);for(let i=0;i<3;i++){const c=document.createElement("div");c.className="ico";b.appendChild(c)}
+  const ch=document.createElement("div");ch.className="chips";
+  ["All","Islam","Business","Podcasts","Live","Mixes"].forEach((x,i)=>{const c=document.createElement("div");c.className="chip"+(i==0?" sel":"");c.textContent=x;ch.appendChild(c)});
+  f.append(b,ch);return f
+}
+function home(el){
+  el.replaceChildren(topBar());
+  const n=pick(3);const list=[n[0],ourVideo(),n[1],n[2]];
+  for(const v of list){
+    const c=document.createElement("div");c.className="card";c.appendChild(thumb(v));
+    const m=document.createElement("div");m.className="meta";m.append(avatar(v.channel),textBlock(v));c.appendChild(m);el.appendChild(c)
+  }
+}
+function upNext(el){
+  el.replaceChildren();
+  const n=pick(7);const playing=n[0];
+  const p=thumb(playing,"player");p.querySelector(".len")?.remove();el.appendChild(p);
+  const wt=document.createElement("div");wt.className="wtitle";wt.textContent=playing.title;
+  const wm=document.createElement("div");wm.className="wmeta";wm.textContent=[playing.channel,fmtViews(playing.views)].filter(Boolean).join(" · ");
+  el.append(wt,wm);
+  const list=[n[1],n[2],ourVideo(),n[3],n[4],n[5],n[6]];
+  for(const v of list){const r=document.createElement("div");r.className="rowv";r.append(thumb(v),textBlock(v));el.appendChild(r)}
+}
+function channel(el){
+  el.replaceChildren();
+  const h=document.createElement("div");h.className="chead";
+  const nm=document.createElement("div");nm.innerHTML="<div style='font-size:20px;font-weight:700'>Abu Lahya</div><div style='font-size:13px;color:#aaa'>@AbuLayha</div>";
+  h.append(avatar("Abu Lahya",56),nm);
+  const tabs=document.createElement("div");tabs.className="tabs";tabs.innerHTML="<span>Home</span><b>Videos</b><span>Shorts</span><span>Live</span><span>Playlists</span>";
+  const g=document.createElement("div");g.className="grid";
+  const list=[ourVideo(),...DATA.ours.slice(0,11)];
+  for(const v of list.slice(0,12)){const c=document.createElement("div");c.className=v.ours?"ours":"";c.appendChild(thumb(v));
+    const tb=textBlock(v);tb.querySelector(".m").textContent=[v.ours?"New":fmtViews(v.views),v.ours?"Just now":age(v.id)].filter(Boolean).join(" · ");c.appendChild(tb);g.appendChild(c)}
+  el.append(h,tabs,g)
+}
+function renderOpts(){
+  const o=$("opts");o.querySelectorAll("button").forEach(b=>b.remove());
+  ["A","B","C"].forEach((k,i)=>{const b=document.createElement("button");b.textContent=k;b.disabled=!state.imgs[i];if(i==state.sel)b.className="on";
+    b.onclick=()=>{state.sel=i;renderAll()};o.appendChild(b)});
+  const th=$("thumbs");th.replaceChildren();
+  state.imgs.forEach((x,i)=>{const d=document.createElement("div");const im=new Image();im.src=x.url;im.alt="";const s=document.createElement("span");s.textContent=["A","B","C"][i]+" · "+x.name;d.append(im,s);th.appendChild(d)})
+}
+function renderAll(){renderOpts();home($("homeDark"));home($("homeLight"));upNext($("upNext"));channel($("channel"))}
+function addFiles(files){
+  const list=[...files].filter(f=>f.type.startsWith("image/")).slice(0,3);if(!list.length)return;
+  state.imgs.forEach(x=>URL.revokeObjectURL(x.url));
+  state.imgs=list.map(f=>({url:URL.createObjectURL(f),name:f.name}));state.sel=0;
+  if(state.imgs[0]){const base=state.imgs[0].name.replace(/\.[^.]+$/,"");try{localStorage.setItem("ftLast",base)}catch(e){}}
+  renderAll()
+}
+const drop=$("drop");
+drop.onclick=()=>$("file").click();
+drop.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("file").click()}};
+$("file").onchange=e=>addFiles(e.target.files);
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+document.addEventListener("dragover",e=>e.preventDefault());document.addEventListener("drop",e=>{e.preventDefault();if(e.target.closest&&!e.target.closest("#drop"))addFiles(e.dataTransfer.files)});
+$("title").oninput=renderAll;$("len").oninput=renderAll;
+$("shuffle").onclick=()=>{state.seed++;renderAll()};
+try{const t=localStorage.getItem("ftTitle");if(t)$("title").value=t}catch(e){}
+$("title").addEventListener("change",()=>{try{localStorage.setItem("ftTitle",$("title").value)}catch(e){}});
+if(DATA){
+  $("built").textContent="Other videos last refreshed "+DATA.built+".";
+  const groups={audience:"channels our audience watches",watched:"channels from what our audience watches",model:"money and challenge channels we model"};
+  const by={};DATA.channels.forEach(c=>(by[c.group]=by[c.group]||[]).push(c.name));
+  $("sources").textContent="The other videos come from: "+Object.entries(by).map(([g,n])=>`${groups[g]} (${n.join(", ")})`).join("; ")+". The views and dates under them are approximate.";
+  renderAll();
+  const showCheck=()=>{
+    if(location.hash!=="#check"||document.getElementById("checkView"))return;
+    // Check view for whoever refreshes the page: every neighbour thumbnail with its ID, to look over by eye.
+    const g=document.createElement("div");g.id="checkView";g.style.cssText="position:fixed;inset:0;z-index:99;background:#111;color:#fff;overflow:auto;padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;font:11px sans-serif";
+    DATA.neighbours.forEach(v=>{const d=document.createElement("div");const i=new Image();i.src=`https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`;i.style.cssText="width:100%;display:block";const s=document.createElement("div");s.textContent=`${v.id} · ${v.channel} · ${v.title}`;d.append(i,s);g.appendChild(d)});
+    document.body.appendChild(g)
+  };
+  showCheck();window.addEventListener("hashchange",showCheck);
+}else{$("sources").textContent="No video data in this file. Rebuild it."}
+</script>
+</body>
+</html>
